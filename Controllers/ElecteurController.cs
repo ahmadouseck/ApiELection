@@ -42,35 +42,30 @@ namespace ApiELection.Controllers
         // Creer un centre
         [HttpPost]
 
-        public ActionResult<Centre> CreateElecteur(Electeur electeur)
+        public Task<ActionResult<Electeur>> CreateElecteur(Electeur electeur)
         {
-
-            return Ok(ielecteur.AddE(electeur));
+            var e = await ielecteur.AddE(electeur);
+          
+            return Ok(e);
 
         }
 
-        // Mettre a jour un centre
+        // Mettre a jour un electeur
         [HttpPut("{id}")]
         public void UpdateElecteur(int id, Electeur electeur)
         {
-            electeur.NumE = id;
-            if (ielecteur.Update(id, electeur) != null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var e = await ibureau.Update(id, electeur);
+            if (e is null)
+                return NotFound();
+            return Ok(e);
         }
 
         // Supprimer un centre
         [HttpDelete("{id}")]
-        public async void DeleteElecteur(int id)
+        public async Task<ActionResult> DeleteElecteur(int id)
         {
-            Electeur electeur = await ielecteur.Get(id);
-            if (electeur == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            ielecteur.Delete(id);
+             await ielecteur.Delete(id);
+            return Ok();
         }
 
     }

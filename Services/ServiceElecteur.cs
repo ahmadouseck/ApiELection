@@ -17,15 +17,22 @@ namespace ApiELection.Services
         }
 
 
-        //
+        //Fonction d'ajout
+        // Il faut ajouter si le bureau n'est pas plein au cas contraire l'affecter a un autre bureau
         public async Task<Electeur> AddE(Electeur electeur)
         {
-            if (!apiContext.Electeur.Any(e => e.NumE == electeur.NumE))
+            Bureau bureau = new Bureau();
+            if (bureau.Electeurs.Count <= bureau.Capacite && bureau.Centre.Lieu == electeur.Lieu_residence)
             {
-                throw new HttpResponseException(HttpStatusCode.NoContent);
+               
+                apiContext.Electeur.Add(electeur);
+                await apiContext.SaveChangesAsync();
             }
-            apiContext.Electeur.Add(electeur);
-            await apiContext.SaveChangesAsync();
+            else
+            {
+              
+                throw new HttpResponseException("Bureau plein");
+            }
 
             return electeur;
         }
@@ -33,23 +40,24 @@ namespace ApiELection.Services
         //
         public async Task Delete(int id)
         {
-            var req = await apiContext.Electeur.FindAsync(id);
+            var req = apiContext.Electeur.FirstOrDefault(req => req.NumE== id);
 
-            if (req == null)
-            {
+            if (req is null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+
 
             apiContext.Electeur.Remove(req);
             await apiContext.SaveChangesAsync();
 
-            throw new HttpResponseException(HttpStatusCode.NoContent);
         }
 
         //
         public async Task<Electeur> Get(int id)
         {
-            return await apiContext.Electeur.FindAsync(id);
+            var e = await apiContext.Bureau.FirstOrDefaultAsync(e => e.NumE == id);
+            if (e is null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return e;
         }
 
         //
@@ -59,27 +67,18 @@ namespace ApiELection.Services
         }
 
         //
-        public async Task Update(int id, Electeur electeur)
+        public async Task<Electeur> Update(int id, Electeur electeur)
         {
             if (id != electeur.NumE)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
-            var ftask = await apiContext.Electeur.FindAsync(id);
-            if (ftask == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            ftask.Nom = electeur.Nom;
-            ftask.Prenom = electeur.Prenom;
-            ftask.Lieu_residence = electeur.Lieu_residence;
-            ftask.Bureau = electeur.Bureau;
+            apiContext.Update(electeur);
             await apiContext.SaveChangesAsync();
 
+            return electeur;
 
-            throw new HttpResponseException(HttpStatusCode.NoContent);
         }
     }
 }

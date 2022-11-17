@@ -10,7 +10,7 @@ namespace ApiELection.Controllers
     [ApiController]
     public class CentreController : ControllerBase
     {
-        
+
         //static readonly ServiceCentre serviceCentre = new ServiceCentre();
         private readonly InterfaceCentre icenter;
 
@@ -24,7 +24,7 @@ namespace ApiELection.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Centre>>> GetAllCenter()
         {
-            var  centre = await icenter.GetAll();
+            var centre = await icenter.GetAll();
             return Ok(centre);
 
         }
@@ -42,45 +42,42 @@ namespace ApiELection.Controllers
             return Ok(centre);
         }
 
+        /*
         //Recuperer les centres selon leur lieu
-       // [HttpGet]
-        //public IEnumerable<Centre> GetCenterByPlace(string lieu)
-       // {
-        //    return icenter.GetAll().Where(
-        //        centre => string.Equals(centre.Lieu, lieu, StringComparison.OrdinalIgnoreCase));
-        //}
+        [HttpGet("lieu/{Lieu}")]
+        public IEnumerable<Centre> GetCenterByPlace(string lieu)
+         {
+            return icenter.GetCentre().Where(
+               centre => string.Equals(centre.Lieu, lieu, StringComparison.OrdinalIgnoreCase));
+        }*/
 
         // Creer un centre
         [HttpPost]
-     
-        public ActionResult<Centre> CreateCenter(Centre centre)
+        public async Task<ActionResult<Centre>> CreateCenter(Centre centre)
         {
-            
-            return Ok(icenter.AddC(centre));
-          
+            var c= await icenter.AddC(centre);
+
+            return Ok(c);
         }
 
         // Mettre a jour un centre
         [HttpPut("{id}")]
-        public void UpdateCenter(int id, Centre centre)
+        public async Task<ActionResult<Centre>> UpdateCenter(int id, [FromBody] Centre centre)
         {
-            centre.NumC = id;
-            if (icenter.Update(id,centre) != null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+
+            var c = await icenter.Update(id, centre);
+            if (c is null)
+                return NotFound();
+            return Ok(c);
         }
 
         // Supprimer un centre
         [HttpDelete("{id}")]
-        public async void DeleteCentre(int id)
+        public async Task<ActionResult> DeleteCentre(int id)
         {
-            Centre centre =await icenter.Get(id);
-            if (centre == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-            icenter.Delete(id);
+            await icenter.Delete(id);
+            return Ok();
+
         }
     }
 }

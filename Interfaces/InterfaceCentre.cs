@@ -8,6 +8,8 @@ namespace ApiELection.Interfaces
         Task<Centre> Get(int id);
         Task<Centre> AddC(Centre centre);
         Task Delete(int id);
-        Task Update(int id,Centre centre);
+        Task<Centre> Update(int id, Centre centre);
+    
+
     }
 }

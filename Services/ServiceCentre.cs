@@ -30,19 +30,16 @@ namespace ApiELection.Services
         //
         public async Task<Centre> Get(int id)
         {
-
-            return await apiContext.Centre.FindAsync(id);
-            
+            var c = await apiContext.Centre.FirstOrDefaultAsync(c => c.NumC == id);
+            if (c is null) throw new HttpResponseException(HttpStatusCode.NotFound);
+        
+            return c;
         }
 
-        //
+        //Ajout
         public async Task<Centre> AddC(Centre centre)
         {
 
-            if (!apiContext.Centre.Any(c=> c.NumC == centre.NumC))
-            {
-                throw new HttpResponseException(HttpStatusCode.NoContent);
-            }
             apiContext.Centre.Add(centre);
             await apiContext.SaveChangesAsync();
 
@@ -52,50 +49,38 @@ namespace ApiELection.Services
         //
         public async Task Delete(int id)
         {
-            var req = await apiContext.Centre.FindAsync(id);
+            var req = apiContext.Centre.FirstOrDefault(req => req.NumC == id);
 
-            if (req == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            if (req is null) 
+                   throw new HttpResponseException(HttpStatusCode.NotFound);
+            
 
             apiContext.Centre.Remove(req);
             await apiContext.SaveChangesAsync();
 
-            throw new HttpResponseException(HttpStatusCode.NoContent);
+
 
         }
 
         //
-        public async Task Update(int id, Centre centre)
+        public async Task<Centre> Update(int id, Centre centre)
         {
-
             if (id != centre.NumC)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
-            var ftask = await apiContext.Centre.FindAsync(id);
-            if (ftask == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            apiContext.Update(centre);
+            await apiContext.SaveChangesAsync();
 
-            ftask.Nom = centre.Nom;
-            ftask.Lieu = centre.Lieu;
-            ftask.NombreBureau = centre.NombreBureau;
-             await apiContext.SaveChangesAsync();
- 
-
-            throw new HttpResponseException(HttpStatusCode.NoContent);
-
+            return centre;
         }
 
-     
-       
+        /*
+        public IEnumerable<Centre> GetCentre()
+        {
 
-      
-
-       
+        return apiContext.Centre.ToList();
+        }*/
     }
 }

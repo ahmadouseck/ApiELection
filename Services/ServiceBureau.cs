@@ -3,6 +3,7 @@ using System.Net;
 using ApiELection.Interfaces;
 using ApiELection.models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ApiELection.Services
 {
@@ -18,39 +19,48 @@ namespace ApiELection.Services
             apiContext = context;
         }
 
-        //
-        public async Task<Bureau> AddB(Bureau bureau)
+        //Fonction d'ajout
+        // Il faut ajouter si le centre n'est pas plein au cas contraire l'affecter a un autre centre
+        public async Task<Bureau> AddB( Bureau bureau)
         {
-            if (!apiContext.Bureau.Any(b => b.NumB == bureau.NumB))
-            {
-                throw new HttpResponseException(HttpStatusCode.NoContent);
-            }
+           
             apiContext.Bureau.Add(bureau);
             await apiContext.SaveChangesAsync();
-
             return bureau;
+
         }
 
-        //
+        //Centre centre = new Centre();
+        //if(centre.Bureaux.Count <= centre.NombreBureau) {
+        // }
+        //else
+        //{
+        //  throw new HttpResponseException("Centre plein");
+
+        // }
+
         public async Task Delete(int id)
         {
-            var req = await apiContext.Bureau.FindAsync(id);
+            var req = apiContext.Bureau.FirstOrDefault(req => req.NumB == id);
 
-            if (req == null)
-            {
+            if (req is null)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+
 
             apiContext.Bureau.Remove(req);
             await apiContext.SaveChangesAsync();
 
-            throw new HttpResponseException(HttpStatusCode.NoContent);
+
+
         }
 
         //
         public async Task<Bureau> Get(int id)
         {
-            return await apiContext.Bureau.FindAsync(id);
+            var b = await apiContext.Bureau.FirstOrDefaultAsync(b => b.NumB == id);
+            if (b is null) throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            return b;
         }
 
         //
@@ -60,26 +70,18 @@ namespace ApiELection.Services
         }
 
         //
-        public  async Task Update(int id, Bureau bureau)
+        //
+        public async Task<Bureau> Update(int id, Bureau bureau)
         {
             if (id != bureau.NumB)
             {
                 throw new HttpResponseException(HttpStatusCode.BadRequest);
             }
 
-            var ftask = await apiContext.Bureau.FindAsync(id);
-            if (ftask == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            ftask.Nom = bureau.Nom;
-            ftask.Capacite = bureau.Capacite;
-            ftask.Centre = bureau.Centre;
+            apiContext.Update(bureau);
             await apiContext.SaveChangesAsync();
 
-
-            throw new HttpResponseException(HttpStatusCode.NoContent);
+            return bureau;
         }
     }
 }

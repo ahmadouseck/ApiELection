@@ -8,6 +8,6 @@ namespace ApiELection.Interfaces
         Task<Bureau> Get(int id);
         Task<Bureau> AddB(Bureau bureau);
         Task Delete(int id);
-        Task Update(int id, Bureau bureau);
+        Task<Bureau> Update(int id, Bureau bureau);
     }
 }

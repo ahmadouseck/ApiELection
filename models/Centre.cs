@@ -18,6 +18,6 @@ namespace ApiELection.models
         // relation One_to_many avec la table Bureau : Collection de bureau
         [NotMapped]
         [JsonIgnore]
-        public virtual ICollection<Bureau> Bureaux { get; set; }
+        public virtual ICollection<Bureau>? Bureaux { get; set; }
     }
 }

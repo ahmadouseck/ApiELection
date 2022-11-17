@@ -42,35 +42,30 @@ namespace ApiELection.Controllers
         // Creer un centre
         [HttpPost]
 
-        public ActionResult<Centre> CreateBureau(Bureau bureau)
+        public async Task<ActionResult<Bureau>> CreateBureau([FromBody] Bureau bureau)
         {
-
-            return Ok(ibureau.AddB(bureau));
+            var b = await ibureau.AddB(bureau);
+            return Ok(b);
 
         }
 
         // Mettre a jour un centre
         [HttpPut("{id}")]
-        public void UpdateBureau(int id, Bureau bureau)
+        public async Task<ActionResult<Bureau>> UpdateBureau(int id, Bureau bureau)
         {
-            bureau.NumB = id;
-            if (ibureau.Update(id, bureau) != null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+            var b = await ibureau.Update(id, bureau);
+            if (b is null)
+                return NotFound();
+            return Ok(b); 
+            
         }
 
         // Supprimer un centre
         [HttpDelete("{id}")]
-        public async void DeleteBureau(int id)
+        public async Task<ActionResult> DeleteBureau(int id)
         {
-            Bureau bureau = await ibureau.Get(id);
-            if (bureau == null)
-            {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            ibureau.Delete(id);
+            await ibureau.Delete(id);
+            return Ok();
         }
     }
 }

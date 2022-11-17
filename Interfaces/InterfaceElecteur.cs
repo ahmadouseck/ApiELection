@@ -15,7 +15,7 @@ namespace ApiELection.Interfaces
         Task<Electeur> Get(int id);
 
         //Mettre a jour un electeur
-        Task Update(int id, Electeur electeur);
+        Task<Electeur> Update(int id, Electeur electeur);
 
         //supprimer un electeur
         Task Delete(int id);

@@ -13,7 +13,6 @@ namespace ApiELection.models
         [Required]
         public string Lieu_residence { get; set; }
 
-
         // relation Manu_to_one avec la table Bureau : Un bureau
         public Bureau Bureau { get; set; }
     }
